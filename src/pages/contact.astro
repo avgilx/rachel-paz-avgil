@@ -1,0 +1,298 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { commission, contact, site } from '../content/site';
+
+const c = contact.channels;
+
+// רק ערוצים שמולאו בפועל מגיעים לתצוגה.
+const channels = [
+  c.phone && { label: 'טלפון', value: c.phone, href: `tel:${c.phone.replace(/[^\d+]/g, '')}` },
+  c.whatsapp && {
+    label: 'וואטסאפ',
+    value: 'שליחת הודעה',
+    href: `https://wa.me/${c.whatsapp.replace(/[^\d]/g, '')}`,
+    external: true,
+  },
+  c.email && { label: 'אימייל', value: c.email, href: `mailto:${c.email}` },
+  c.instagram && { label: 'Instagram', value: 'לצפייה בעמוד', href: c.instagram, external: true },
+  c.facebook && { label: 'Facebook', value: 'לצפייה בעמוד', href: c.facebook, external: true },
+].filter(Boolean) as {
+  label: string;
+  value: string;
+  href: string;
+  external?: boolean;
+}[];
+
+const hasForm = Boolean(contact.formEndpoint);
+const hasAnything = channels.length > 0 || hasForm;
+const L = contact.formLabels;
+---
+
+<Base
+  title={`${contact.title} | ${site.name}`}
+  description={contact.intro}
+  ogImage="/og-about.jpg"
+>
+  <PageHeader eyebrow="דברו איתי" title={contact.title} intro={contact.intro} />
+
+  <section class="section section--tight">
+    <div class:list={['container', 'contact', !hasAnything && 'contact--quiet']}>
+      <div class="contact__main">
+        {
+          channels.length > 0 && (
+            <ul class="channels">
+              {channels.map((ch) => (
+                <li class="channel">
+                  <span class="channel__label">{ch.label}</span>
+                  <a
+                    class="channel__value"
+                    href={ch.href}
+                    {...(ch.external ? { target: '_blank', rel: 'noopener' } : {})}
+                  >
+                    {ch.value}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )
+        }
+
+        {
+          hasForm && (
+            <form class="cform" data-contact-form action={contact.formEndpoint} method="post" novalidate>
+              <p class="cform__row">
+                <label for="cf-name">{L.name}</label>
+                <input id="cf-name" name="name" type="text" required autocomplete="name" />
+              </p>
+              <p class="cform__row">
+                <label for="cf-email">{L.email}</label>
+                <input id="cf-email" name="email" type="email" required autocomplete="email" />
+              </p>
+              <p class="cform__row">
+                <label for="cf-phone">{L.phone}</label>
+                <input id="cf-phone" name="phone" type="tel" autocomplete="tel" />
+              </p>
+              <p class="cform__row">
+                <label for="cf-message">{L.message}</label>
+                <textarea id="cf-message" name="message" rows="5" required />
+              </p>
+              <p class="cform__trap" aria-hidden="true">
+                <label for="cf-company">אל תמלאו שדה זה</label>
+                <input id="cf-company" name="company" type="text" tabindex="-1" autocomplete="off" />
+              </p>
+              <button class="btn btn--solid" type="submit" data-cform-submit>{L.submit}</button>
+              <p class="cform__status" data-cform-status role="status" aria-live="polite" />
+              <template data-cform-sending>{L.sending}</template>
+              <template data-cform-success>{L.success}</template>
+              <template data-cform-error>{L.error}</template>
+            </form>
+          )
+        }
+
+        {!hasAnything && <p class="contact__pending">{contact.pendingNote}</p>}
+      </div>
+
+      <aside class="contact__aside">
+        <h2>{commission.title}</h2>
+        <p>{commission.text}</p>
+        {c.location && <p class="contact__location">{c.location}</p>}
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .contact {
+    display: grid;
+    gap: clamp(2.5rem, 6vw, 5rem);
+    align-items: start;
+  }
+
+  @media (min-width: 900px) {
+    .contact {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
+    }
+
+    /* כל עוד אין ערוץ קשר או טופס — עמודה אחת צרה, בלי חלל ריק מיותר */
+    .contact--quiet {
+      grid-template-columns: minmax(0, 780px);
+      justify-content: start;
+    }
+  }
+
+  .contact--quiet .contact__main {
+    order: 2;
+  }
+
+  .channels {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0;
+    border-top: 1px solid var(--line-soft);
+  }
+
+  .channel {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 1.15rem;
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .channel__label {
+    font-size: var(--step--1);
+    letter-spacing: 0.14em;
+    color: var(--ink-muted);
+  }
+
+  .channel__value {
+    font-family: 'Frank Ruhl Libre', Georgia, serif;
+    font-size: var(--step-1);
+    text-decoration: none;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 0.15rem;
+  }
+
+  .channel__value:hover {
+    border-bottom-color: currentColor;
+  }
+
+  .contact__pending {
+    color: var(--ink-muted);
+    font-size: var(--step-0);
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--line-soft);
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .contact__aside {
+    background: var(--paper-warm);
+    border: 1px solid var(--line-soft);
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    display: grid;
+    gap: 1rem;
+  }
+
+  .contact__aside h2 {
+    font-size: var(--step-2);
+  }
+
+  .contact__aside p {
+    color: var(--ink-soft);
+    font-weight: 300;
+  }
+
+  .contact__location {
+    font-size: var(--step--1);
+    letter-spacing: 0.1em;
+    color: var(--ink-muted);
+  }
+
+  /* ─────────────────────────── טופס ─────────────────────────── */
+  .cform {
+    display: grid;
+    gap: 1.15rem;
+    margin-top: 2.5rem;
+    max-width: 34rem;
+  }
+
+  .cform__row {
+    display: grid;
+    gap: 0.45rem;
+    margin: 0;
+  }
+
+  .cform label {
+    font-size: var(--step--1);
+    letter-spacing: 0.1em;
+    color: var(--ink-muted);
+  }
+
+  .cform input,
+  .cform textarea {
+    font: inherit;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    padding: 0.75rem 0.9rem;
+    width: 100%;
+    transition: border-color 0.25s var(--ease);
+  }
+
+  .cform input:focus,
+  .cform textarea:focus {
+    border-color: var(--terracotta);
+  }
+
+  .cform textarea {
+    resize: vertical;
+  }
+
+  .cform button {
+    justify-self: start;
+  }
+
+  .cform__trap {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    margin: -1px;
+  }
+
+  .cform__status {
+    margin: 0;
+    font-size: var(--step--1);
+    min-height: 1.5em;
+  }
+
+  .cform__status[data-state='error'] {
+    color: var(--terracotta);
+  }
+</style>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
+  if (form) {
+    const status = form.querySelector<HTMLElement>('[data-cform-status]')!;
+    const submit = form.querySelector<HTMLButtonElement>('[data-cform-submit]')!;
+    const text = (name: string) =>
+      form.querySelector<HTMLTemplateElement>(`[data-cform-${name}]`)?.innerHTML.trim() ?? '';
+    const label = submit.textContent ?? '';
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      if ((form.elements.namedItem('company') as HTMLInputElement)?.value) return;
+
+      submit.disabled = true;
+      status.dataset.state = 'pending';
+      status.textContent = text('sending');
+
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          headers: { Accept: 'application/json' },
+          body: new FormData(form),
+        });
+        if (!response.ok) throw new Error(String(response.status));
+        form.reset();
+        status.dataset.state = 'success';
+        status.textContent = text('success');
+      } catch {
+        status.dataset.state = 'error';
+        status.textContent = text('error');
+      } finally {
+        submit.disabled = false;
+        submit.textContent = label;
+      }
+    });
+  }
+</script>

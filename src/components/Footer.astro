@@ -1,0 +1,118 @@
+---
+import { footer, nav, contact } from '../content/site';
+import { withBase } from '../lib/url';
+
+const year = new Date().getFullYear();
+
+const links = [
+  contact.channels.instagram && { label: 'Instagram', href: contact.channels.instagram },
+  contact.channels.facebook && { label: 'Facebook', href: contact.channels.facebook },
+].filter(Boolean) as { label: string; href: string }[];
+---
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <div class="site-footer__identity">
+      <p class="site-footer__name">{footer.name}</p>
+      <p class="site-footer__tagline">{footer.tagline}</p>
+    </div>
+
+    <nav class="site-footer__nav" aria-label="ניווט תחתון">
+      <ul>
+        {nav.map((item) => <li><a href={withBase(item.href)}>{item.label}</a></li>)}
+      </ul>
+    </nav>
+
+    {
+      links.length > 0 && (
+        <ul class="site-footer__social">
+          {links.map((l) => (
+            <li>
+              <a href={l.href} rel="me noopener" target="_blank">
+                {l.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      )
+    }
+
+    <p class="site-footer__legal">
+      <small>© {year} {footer.name}. כל הזכויות שמורות.</small>
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--line-soft);
+    background: var(--paper-warm);
+    padding-block: clamp(3rem, 6vw, 5rem);
+    margin-top: auto;
+  }
+
+  .site-footer__inner {
+    display: grid;
+    gap: 2rem;
+  }
+
+  .site-footer__name {
+    font-family: 'Frank Ruhl Libre', Georgia, serif;
+    font-size: var(--step-2);
+    line-height: 1.2;
+  }
+
+  .site-footer__tagline {
+    color: var(--ink-muted);
+    font-size: var(--step--1);
+    letter-spacing: 0.14em;
+    margin-top: 0.4rem;
+  }
+
+  .site-footer__nav ul,
+  .site-footer__social {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.75rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .site-footer__nav a,
+  .site-footer__social a {
+    text-decoration: none;
+    font-size: var(--step--1);
+    color: var(--ink-soft);
+    letter-spacing: 0.04em;
+  }
+
+  .site-footer__nav a:hover,
+  .site-footer__social a:hover {
+    color: var(--terracotta);
+  }
+
+  .site-footer__legal {
+    color: var(--ink-muted);
+    font-size: 0.8rem;
+    letter-spacing: 0.03em;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line-soft);
+  }
+
+  @media (min-width: 860px) {
+    .site-footer__inner {
+      grid-template-columns: 1fr auto;
+      align-items: start;
+      column-gap: 4rem;
+    }
+
+    .site-footer__identity {
+      grid-row: span 2;
+    }
+
+    .site-footer__legal {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

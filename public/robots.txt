@@ -1,0 +1,5 @@
+# תצוגה מקדימה — האתר עדיין לא סופי ולכן חסום למנועי חיפוש.
+# כשעולים לאוויר: להחליף את השורה Disallow ב-  Allow: /
+# ולשנות את site.noindex ל-false בקובץ src/content/site.ts
+User-agent: *
+Disallow: /

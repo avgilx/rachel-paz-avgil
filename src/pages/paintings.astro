@@ -1,0 +1,29 @@
+---
+import Base from '../layouts/Base.astro';
+import Gallery from '../components/Gallery.astro';
+import PageHeader from '../components/PageHeader.astro';
+import { galleries, site } from '../content/site';
+import { byCategory } from '../content/works';
+
+const works = byCategory('paintings');
+const page = galleries.paintings;
+---
+
+<Base
+  title={`${page.title} | ${site.name}`}
+  description={`גלריית ציורי השמן של רחל פז אבגיל — ${page.intro}`}
+  ogImage="/og-default.jpg"
+>
+  <PageHeader
+    eyebrow="גלריה"
+    title={page.title}
+    intro={page.intro}
+    count={`${works.length} עבודות`}
+  />
+
+  <section class="section section--tight" aria-label={page.title}>
+    <div class="container">
+      <Gallery works={works} label={page.title} />
+    </div>
+  </section>
+</Base>

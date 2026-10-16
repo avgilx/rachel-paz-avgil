@@ -1,0 +1,247 @@
+---
+import { nav, site } from '../content/site';
+import { withBase } from '../lib/url';
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const path = (Astro.url.pathname.replace(/\/+$/, '') || '/').replace(base, '') || '/';
+const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
+---
+
+<header class="site-header">
+  <div class="site-header__inner container">
+    <a class="wordmark" href={withBase('/')}>
+      <span class="wordmark__name">{site.name}</span>
+      <span class="wordmark__role">{site.tagline}</span>
+    </a>
+
+    <button
+      type="button"
+      class="nav-toggle"
+      aria-expanded="false"
+      aria-controls="site-nav"
+      data-nav-toggle
+    >
+      <span class="nav-toggle__bars" aria-hidden="true"><i></i><i></i></span>
+      <span class="nav-toggle__label">תפריט</span>
+    </button>
+
+    <nav id="site-nav" class="site-nav" aria-label="ניווט ראשי" data-nav>
+      <ul>
+        {
+          nav.map((item) => (
+            <li>
+              <a href={withBase(item.href)} aria-current={isCurrent(item.href) ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 60;
+    background: color-mix(in srgb, var(--paper) 88%, transparent);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--line-soft);
+  }
+
+  .site-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    min-height: 4.75rem;
+  }
+
+  .wordmark {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    text-decoration: none;
+    padding-block: 0.5rem;
+  }
+
+  .wordmark__name {
+    font-family: 'Frank Ruhl Libre', Georgia, serif;
+    font-size: clamp(1.08rem, 1rem + 0.4vw, 1.32rem);
+    letter-spacing: 0.02em;
+    line-height: 1.1;
+  }
+
+  .wordmark__role {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    color: var(--ink-muted);
+    line-height: 1;
+  }
+
+  .site-nav ul {
+    display: flex;
+    align-items: center;
+    gap: clamp(1.1rem, 2.4vw, 2.4rem);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .site-nav a {
+    display: inline-block;
+    text-decoration: none;
+    font-size: var(--step--1);
+    letter-spacing: 0.05em;
+    color: var(--ink-soft);
+    padding-block: 0.4rem;
+    position: relative;
+  }
+
+  .site-nav a::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.35s var(--ease);
+  }
+
+  .site-nav a:hover,
+  .site-nav a[aria-current='page'] {
+    color: var(--ink);
+  }
+
+  .site-nav a:hover::after,
+  .site-nav a[aria-current='page']::after {
+    transform: scaleX(1);
+  }
+
+  .site-nav a[aria-current='page']::after {
+    background: var(--terracotta);
+  }
+
+  .nav-toggle {
+    display: none;
+    align-items: center;
+    gap: 0.6rem;
+    background: none;
+    border: 0;
+    padding: 0.55rem 0.2rem;
+    cursor: pointer;
+    font-size: var(--step--1);
+    letter-spacing: 0.08em;
+    color: var(--ink);
+  }
+
+  .nav-toggle__bars {
+    display: grid;
+    gap: 5px;
+    width: 22px;
+  }
+
+  .nav-toggle__bars i {
+    display: block;
+    height: 1px;
+    background: currentColor;
+    transition: transform 0.3s var(--ease), opacity 0.3s var(--ease);
+  }
+
+  .nav-toggle[aria-expanded='true'] .nav-toggle__bars i:first-child {
+    transform: translateY(3px) rotate(45deg);
+  }
+
+  .nav-toggle[aria-expanded='true'] .nav-toggle__bars i:last-child {
+    transform: translateY(-3px) rotate(-45deg);
+  }
+
+  @media (max-width: 720px) {
+    .nav-toggle {
+      display: inline-flex;
+    }
+
+    .site-nav {
+      position: fixed;
+      inset: 4.75rem 0 auto 0;
+      background: var(--paper);
+      border-bottom: 1px solid var(--line);
+      padding: 0.5rem var(--gutter) 2rem;
+      display: grid;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-8px);
+      transition: opacity 0.3s var(--ease), transform 0.3s var(--ease), visibility 0.3s;
+      max-height: calc(100dvh - 4.75rem);
+      overflow-y: auto;
+    }
+
+    .site-nav[data-open='true'] {
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+    }
+
+    .site-nav ul {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+    }
+
+    .site-nav li + li {
+      border-top: 1px solid var(--line-soft);
+    }
+
+    .site-nav a {
+      font-size: var(--step-1);
+      padding-block: 1rem;
+      font-family: 'Frank Ruhl Libre', Georgia, serif;
+    }
+
+    .site-nav a::after {
+      display: none;
+    }
+
+    .site-nav a[aria-current='page'] {
+      color: var(--terracotta);
+    }
+  }
+</style>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('[data-nav-toggle]');
+  const menu = document.querySelector<HTMLElement>('[data-nav]');
+
+  if (toggle && menu) {
+    const setOpen = (open: boolean) => {
+      toggle.setAttribute('aria-expanded', String(open));
+      menu.dataset.open = String(open);
+      document.body.style.overflow = open ? 'hidden' : '';
+    };
+
+    toggle.addEventListener('click', () => {
+      setOpen(toggle.getAttribute('aria-expanded') !== 'true');
+    });
+
+    menu.addEventListener('click', (event) => {
+      if ((event.target as HTMLElement).closest('a')) setOpen(false);
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+
+    const mq = window.matchMedia('(min-width: 721px)');
+    mq.addEventListener('change', (e) => {
+      if (e.matches) setOpen(false);
+    });
+  }
+</script>

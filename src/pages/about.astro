@@ -1,0 +1,109 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import { about, commission, site } from '../content/site';
+import { getAsset } from '../lib/images';
+import { withBase } from '../lib/url';
+
+const portrait = getAsset(about.portrait);
+---
+
+<Base
+  title={`${about.title} | ${site.name}`}
+  description={about.paragraphs[0]}
+  ogImage="/og-about.jpg"
+>
+  <section class="section about">
+    <div class="container about__inner">
+      <figure class="about__figure">
+        <Image
+          src={portrait}
+          alt={about.portraitAlt}
+          widths={[420, 640, 860]}
+          sizes="(min-width: 900px) 40vw, 88vw"
+          loading="eager"
+          fetchpriority="high"
+          quality={82}
+        />
+      </figure>
+
+      <div class="about__body">
+        <p class="eyebrow">האמנית</p>
+        <h1>{about.title}</h1>
+        {about.paragraphs.map((p) => <p class="about__p">{p}</p>)}
+
+        <div class="about__cta">
+          <a class="btn" href={withBase('/paintings')}>ציורי שמן</a>
+          <a class="btn" href={withBase('/sculpture')}>פיסול</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--stone section--tight" aria-labelledby="about-commission">
+    <div class="container--narrow about__note">
+      <h2 id="about-commission">{commission.title}</h2>
+      <p class="lede">{commission.text}</p>
+      <a class="btn btn--solid" href={withBase(commission.cta.href)}>{commission.cta.label}</a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .about__inner {
+    display: grid;
+    gap: clamp(2.25rem, 5vw, 4.5rem);
+    align-items: start;
+  }
+
+  .about__figure {
+    margin: 0;
+  }
+
+  .about__figure :global(img) {
+    width: 100%;
+    height: auto;
+    box-shadow: var(--shadow-lift);
+  }
+
+  .about__body h1 {
+    margin-bottom: 1.75rem;
+  }
+
+  .about__p {
+    color: var(--ink-soft);
+    max-width: var(--measure);
+    font-weight: 300;
+    line-height: 1.9;
+  }
+
+  .about__p + .about__p {
+    margin-top: 1.35rem;
+  }
+
+  .about__cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    margin-top: 2.5rem;
+  }
+
+  .about__note {
+    display: grid;
+    justify-items: start;
+    gap: 1.4rem;
+    text-align: start;
+  }
+
+  @media (min-width: 900px) {
+    .about__inner {
+      grid-template-columns: minmax(0, 0.72fr) minmax(0, 1fr);
+      gap: clamp(3rem, 6vw, 6rem);
+    }
+
+    .about__figure {
+      position: sticky;
+      top: 7rem;
+    }
+  }
+</style>

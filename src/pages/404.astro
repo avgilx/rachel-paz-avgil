@@ -1,0 +1,37 @@
+---
+import Base from '../layouts/Base.astro';
+import { site } from '../content/site';
+import { withBase } from '../lib/url';
+---
+
+<Base title={`הדף לא נמצא | ${site.name}`} description="הדף המבוקש אינו קיים באתר.">
+  <section class="section notfound">
+    <div class="container--narrow">
+      <p class="eyebrow">404</p>
+      <h1>הדף שחיפשתם לא נמצא</h1>
+      <p class="lede">ייתכן שהכתובת השתנתה. אפשר לחזור לעמוד הראשי או לעבור ישירות אל הגלריות.</p>
+      <div class="notfound__actions">
+        <a class="btn btn--solid" href={withBase('/')}>לעמוד הראשי</a>
+        <a class="btn" href={withBase('/paintings')}>ציורי שמן</a>
+        <a class="btn" href={withBase('/sculpture')}>פיסול</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .notfound {
+    padding-block: clamp(4rem, 12vw, 9rem);
+  }
+
+  .notfound h1 {
+    margin-bottom: 1.25rem;
+  }
+
+  .notfound__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    margin-top: 2.5rem;
+  }
+</style>
